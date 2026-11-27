@@ -20,7 +20,7 @@ test('regenerates byte-identical output for the default plan', async () => {
       const files = (await readdir(path.join(out, dir))).sort();
       assert.ok(files.length > 0, dir);
       for (const f of files) {
-        const a = await readFile(new URL(`../${dir}/${f}`, import.meta.url), 'utf8');
+        const a = await readFile(new URL(`../dist/${dir}/${f}`, import.meta.url), 'utf8');
         const b = await readFile(path.join(out, dir, f), 'utf8');
         assert.equal(b, a, `${dir}/${f}`);
       }

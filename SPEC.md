@@ -1,10 +1,10 @@
 # 吉他指板音阶模进训练 · 规格文档
 
-> 版本：v1.1（非 C 调 PNG 清理）  
-> 日期：2026-11-25  
-> 状态：665 个 `.atex` 已验证（C/D/E/F/G/A/B 七个自然音主音），alphaTab 1.9 逐音比对 0 错误；PNG 仅保留 C 调 98 张；T3 待补  
+> 版本：v2.0（重构为可移植生成器）  
+> 日期：2026-11-27  
+> 状态：1253 个 `.atex` 已验证（7 个自然音 Ionian + C 调 6 种调式），alphaTab 1.9 逐音比对 0 错误；T3 待补；不出 PNG  
 > 目标格式：alphaTex（`.atex`），alphaTab 1.9  
-> 本轮范围：自然音主音 Ionian（C、D、E、F、G、A、B）；含升降号的主音（C#、D#、F#、G#、A#）暂不生成
+> 主音范围：12 个主音均可作为输入；调号超出 ±7 的（主音×调式）组合会被拒绝并提示等音主音
 
 ---
 
@@ -236,10 +236,10 @@ C-Ionian/
 
 ### 5.5 其他调式/调
 
-- 本轮已把同一套规则扩展到 **7 个自然音主音的 Ionian 调**（C、D、E、F、G、A、B），共 665 个 `.atex`。
+- 同一套规则覆盖 **7 个自然音主音的 Ionian**（C、D、E、F、G、A、B），共 665 个 `.atex`；另有 C 调 6 种调式 588 个，合计 1253。
 - 每个调独立生成：同一 `iN` 下 T1 = 链长条、T2 = 相邻对数条（pivot 断点不计）。
-- 含升降号的主音（C#、D#、F#、G#、A#）尚未生成；规则与代码均支持，后续可直接扩展。
-- 其余调式（Dorian … Locrian）仍只做把位链推导验证，不生成 `.atex`。
+- 12 个主音（含 `C# D# F# G# A# Db Eb Gb Ab Bb`）都可作为输入，调号按五度圈推导；推导结果超出 ±7 的组合（如 `G# Ionian`、`Gb Dorian`）整组拒绝，并提示等音主音。
+- 调式也可用任意自然音主音生成：`node src/cli.mjs generate --keys D --modes Dorian`。
 - 84 个“调式 × 调”组合的 pivot 推导见附录 B。
 
 #### 5.5.1 自然音主音文件数
@@ -405,8 +405,7 @@ function t2(A, B, iN):
 
 ## 10. 待确认问题
 
-1. T3 的定义（后续补充）。
-2. PNG 设备矩阵：是否出 phone / tablet / desktop 三套尺寸与每行小节数。
+1. T3 的定义（后续补充；代码侧已留类型注册表插槽）。
 
 已确认项（不再作为问题）：
 
@@ -421,17 +420,10 @@ function t2(A, B, iN):
 
 ---
 
-## 11. PNG 导出（仅 C 调）
+## 11. 图片导出（已移除）
 
-- 当前保留 **98 张 PNG**：`C-Ionian/png/{exercise-id}.png`（覆盖 `i2`–`i8`）。
-- 其余 6 个调（D/E/F/G/A/B）的 PNG 已清理（567 张、约 437 MiB），只保留 `.atex`；需要时可用 `export-png.mjs` 重新生成。
-- 规格：2400px 宽、2 小节/行、长图、白底；隐藏调弦标签与默认力度记号。
-- 导出方式：临时 textool 实例 + headless Chromium；补丁只作用于临时 client，不修改线上 app。
-- 移动端可读性：1080px 宽手机屏缩放后每小节约 540px；后续建议 phone / tablet / desktop 三套。
-- 样例：
-  - `C-Ionian/png/C-Ionian-i2-P1-T1.png`
-  - `C-Ionian/png/C-Ionian-i3-P1-T1.png`
-  - `C-Ionian/png/C-Ionian-i3-P1_P2-T2.png`
+- v2.0 起本仓库**不再产出图片**：`export-png.mjs`、`pnglint.mjs`、`export-all.sh` 与 `.tools/` 一并删除。
+- 需要图片时，可在 guitarTexTool 侧导入 `.atex` 后自行导出；本仓库只保证谱面文本与校验。
 
 ---
 
@@ -567,8 +559,8 @@ A 收尾：E-C
 - 目录 `<Key>-<Mode>/`，文件 `<Key>-<Mode>-<iN>-<Pos>-<T>\.atex`。
 - C 调下 6 个调式的 pivot 均为 **P4**，链长 8，每调式 98 个（T1 56 + T2 42），合计 **588**。
 - 调号取相对大调，使用 alphaTex 原生 `\ks`，不引入新记号。
-- 本轮只生成 `.atex`，不导出 PNG。
-- 校验：`node validate-all.mjs --keys C` → 7 个调式 686/686，0 错误。
+- 只生成 `.atex`，不导出图片。
+- 校验：`node src/cli.mjs validate --keys C` → 7 个调式 686/686，0 错误。
 
 ---
 
@@ -588,7 +580,8 @@ A 收尾：E-C
 | v1.0 | 2026-11-24 | 扩展到 7 个自然音主音：生成 665 个 `.atex`，alphaTab 1.9 逐音校验 0 错误；全量导出 PNG；抽出 `theory.mjs` 共享模块 |
 | v1.1 | 2026-11-25 | 清理非 C 调 PNG（567 张、约 437 MiB）；仅保留 `C-Ionian/png/` 98 张；`.atex` 与调目录全部保留 |
 | v1.2 | 2026-11-25 | 支持调式：生成 C 调 6 种调式 588 个 `.atex`（调号取相对大调）；全量校验 686/686，0 错误 |
+| v2.0 | 2026-11-27 | 重构为可移植生成器：`src/` 分层、类型注册表、12 主音与调号推导（越界拒绝）、入库插件、产物移入 `dist/`；删除 PNG 导出与全部外部仓库依赖；1253 文件逐字节一致 |
 
 ---
 
-*本文档为规格文档；C Ionian 的 98 个练习文件已生成并验证。*
+*本文档为规格文档；1253 个练习文件由 `node src/cli.mjs generate` 生成，`node src/cli.mjs validate` 校验。*

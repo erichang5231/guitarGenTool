@@ -60,7 +60,7 @@ function selection(flags) {
 }
 
 function announceSkips(skipped) {
-  for (const s of skipped) console.log(`SKIP ${s.key} ${s.mode}: ${s.reason}`);
+  for (const s of skipped) console.log(`SKIP ${s.reason}`);
 }
 
 async function runGenerate(flags) {
