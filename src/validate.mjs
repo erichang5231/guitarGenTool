@@ -3,7 +3,7 @@
  * the plan. alphaTab is a devDependency loaded lazily: generate and manifest
  * work without it.
  */
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 function flatten(staff) {
@@ -63,7 +63,7 @@ function checkScore(at, tex, exercise, push, label) {
  * @returns {Promise<{ groups: {dir:string, found:number, expected:number, errors:string[]}[],
  *   totals: { files: number, errors: number } }>}
  */
-export async function validatePlan(exercises, root) {
+export async function validatePlan(exercises, root, { checkExtras = true } = {}) {
   let at;
   try {
     at = await import('@coderline/alphatab');
@@ -74,6 +74,12 @@ export async function validatePlan(exercises, root) {
   }
 
   const groups = new Map();
+  const expectedByDir = new Map();
+  for (const exercise of exercises) {
+    if (!expectedByDir.has(exercise.dir)) expectedByDir.set(exercise.dir, new Set());
+    expectedByDir.get(exercise.dir).add(exercise.id + '.atex');
+  }
+
   for (const exercise of exercises) {
     const group = groups.get(exercise.dir) ?? { dir: exercise.dir, found: 0, expected: 0, errors: [] };
     group.expected++;
@@ -92,6 +98,22 @@ export async function validatePlan(exercises, root) {
       checkScore(at, tex, exercise, (msg) => group.errors.push(msg), label);
     } catch (err) {
       group.errors.push(`PARSE ERROR ${label}: ${err.message}`);
+    }
+  }
+
+  // Files the plan does not know about are as much a defect as missing ones.
+  if (checkExtras) {
+    for (const [dir, known] of expectedByDir) {
+      const group = groups.get(dir);
+      let files;
+      try {
+        files = await readdir(path.join(root, dir));
+      } catch {
+        continue;
+      }
+      for (const file of files) {
+        if (file.endsWith('.atex') && !known.has(file)) group.errors.push(`UNKNOWN ${dir}/${file}`);
+      }
     }
   }
 

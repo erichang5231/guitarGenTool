@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
@@ -77,4 +77,22 @@ test('unknown user fails without creating the user', async () => {
 test('main flow works with plugins present', async () => {
   const r = await run(process.execPath, [cli, 'generate', '--dry-run'], { cwd: '/' });
   assert.match(r.stdout, /planned=1253/);
+});
+
+test('import follows the manifest of --root instead of the default plan', async () => {
+  const dir = await makeDb();
+  const products = await mkdtemp(path.join(tmpdir(), 'ggt-custom-'));
+  try {
+    await run(process.execPath, [cli, 'generate', '--keys', 'C#', '--modes', 'Dorian', '--out', products], { cwd: '/' });
+    const onDisk = await readdir(path.join(products, 'C#-Dorian'));
+    const expected = onDisk.filter((f) => f.endsWith('.atex')).length;
+    const r = await run(process.execPath, [
+      cli, 'import', '--db', path.join(dir, 'alphatex.db'), '--user', 'tester', '--root', products,
+    ], { cwd: '/' });
+    assert.match(r.stdout, new RegExp(`imported=${expected}`));
+    assert.match(r.stdout, /failed=0/);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+    await rm(products, { recursive: true, force: true });
+  }
 });

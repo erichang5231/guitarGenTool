@@ -7,7 +7,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildPlan } from './plan.mjs';
-import { TYPE_NAMES } from './types/index.mjs';
 import { writePlan } from './generate.mjs';
 import { buildManifest, writeManifest } from './manifest.mjs';
 
@@ -105,7 +104,7 @@ async function runValidate(flags) {
     });
   }
 
-  const { groups, totals } = await validatePlan(selected, root);
+  const { groups, totals } = await validatePlan(selected, root, { checkExtras: !flags.sample });
   for (const g of groups) {
     console.log(`${g.dir}: ${g.found}/${g.expected} files, errors=${g.errors.length}`);
     for (const e of g.errors.slice(0, 3)) console.log('  ' + e);
@@ -129,6 +128,19 @@ async function runImport(flags) {
   return runImportCommand(flags, { root: path.resolve(HERE, flags.root ?? 'dist') });
 }
 
+async function runPlugins() {
+  const { loadPlugins } = await import('./plugins.mjs');
+  const plugins = await loadPlugins();
+  if (plugins.size === 0) {
+    console.log('（未安装任何插件）');
+    return 0;
+  }
+  for (const plugin of plugins.values()) {
+    console.log(`${plugin.command.padEnd(8)} ${plugin.name} — ${plugin.describe ?? ''}`);
+  }
+  return 0;
+}
+
 async function main(argv) {
   const { flags, positional } = parseArgv(argv);
   if (flags.help || positional.length === 0) {
@@ -141,7 +153,7 @@ async function main(argv) {
     case 'validate': return runValidate(flags);
     case 'manifest': return runManifest(flags);
     case 'import': return runImport(flags);
-    case 'plugins': console.log(TYPE_NAMES.map((t) => `type ${t}`).join('\n')); return 0;
+    case 'plugins': return runPlugins();
     default: throw new UsageError(`未知命令 "${command}"；可用：generate, validate, manifest, import, plugins`);
   }
 }

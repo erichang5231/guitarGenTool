@@ -44,3 +44,10 @@ test('all targets rejected exits 1', async () => {
   assert.equal(r.code, 1);
   assert.match(r.stdout + r.stderr, /等音主音/);
 });
+
+test('plugins command lists installed plugins, not types', async () => {
+  const r = await call('plugins');
+  assert.equal(r.code, 0);
+  assert.match(r.stdout, /import-textool/);
+  assert.doesNotMatch(r.stdout, /^type T1$/m);
+});
