@@ -1,0 +1,9 @@
+{
+  "name": "guitar-gen-tool",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": { "test": "node --test", "generate": "node src/cli.mjs generate" },
+  "devDependencies": { "@coderline/alphatab": "1.9.0" }
+}

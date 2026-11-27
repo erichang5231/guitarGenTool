@@ -1,0 +1,14 @@
+\title "C Ionian · i2 · P1_P2 · T2"
+\subtitle "二度模进 · 相邻把位上下行"
+\tempo 70
+\track "Guitar" { instrument acousticguitarsteel }
+\staff { score tabs }
+\tuning (E4 B3 G3 D3 A2 E2)
+\ts 4 4
+\ks C
+\section "C-Ionian-i2-P1_P2-T2"
+:8 8.6 10.6 12.6 8.5 10.5 12.5 9.4 10.4 |
+12.4 9.3 10.3 12.3 10.2 12.2 13.2 10.1 |
+12.1 13.1 15.1 13.1 12.1 15.2 13.2 12.2 |
+14.3 12.3 10.3 14.4 12.4 10.4 14.5 12.5 |
+10.5 13.6 12.6 10.6 10.6 8.6 r r |

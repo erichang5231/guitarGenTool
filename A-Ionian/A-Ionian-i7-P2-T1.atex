@@ -1,0 +1,15 @@
+\title "A Ionian · i7 · P2 · T1"
+\subtitle "七度模进 · 同把位上下行"
+\tempo 70
+\track "Guitar" { instrument acousticguitarsteel }
+\staff { score tabs }
+\tuning (E4 B3 G3 D3 A2 E2)
+\ts 4 4
+\ks A
+\section "A-Ionian-i7-P2-T1"
+:8 7.6 7.4 9.6 9.4 10.6 11.4 7.5 7.3 |
+9.5 9.3 11.5 11.3 7.4 9.2 9.4 10.2 |
+11.4 12.2 7.3 9.1 9.3 10.1 11.3 12.1 |
+12.1 11.3 10.1 9.3 9.1 7.3 12.2 11.4 |
+10.2 9.4 9.2 7.4 11.3 11.5 9.3 9.5 |
+7.3 7.5 11.4 10.6 9.4 9.6 7.4 7.6 |

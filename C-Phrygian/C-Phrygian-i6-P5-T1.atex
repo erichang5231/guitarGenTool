@@ -1,0 +1,16 @@
+\title "C Phrygian · i6 · P5 · T1"
+\subtitle "六度模进 · 同把位上下行"
+\tempo 70
+\track "Guitar" { instrument acousticguitarsteel }
+\staff { score tabs }
+\tuning (E4 B3 G3 D3 A2 E2)
+\ts 4 4
+\ks Ab
+\section "C-Phrygian-i6-P5-T1"
+:8 3.6 6.5 4.6 3.4 6.6 5.4 3.5 6.4 |
+4.5 3.3 6.5 5.3 3.4 6.3 5.4 4.2 |
+6.4 6.2 3.3 8.2 5.3 4.1 6.3 6.1 |
+4.2 8.1 8.1 4.2 6.1 6.3 4.1 5.3 |
+8.2 3.3 6.2 6.4 4.2 5.4 6.3 3.4 |
+5.3 6.5 3.3 4.5 6.4 3.5 5.4 6.6 |
+3.4 4.6 6.5 3.6 r r r r |
