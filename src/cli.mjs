@@ -8,9 +8,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildPlan } from './plan.mjs';
 import { TYPE_NAMES } from './types/index.mjs';
+import { writePlan } from './generate.mjs';
+import { buildManifest, writeManifest } from './manifest.mjs';
 
-const ROOT = path.dirname(fileURLToPath(import.meta.url));
-const HERE = path.resolve(ROOT, '..');
+const SRC = path.dirname(fileURLToPath(import.meta.url));
+const HERE = path.resolve(SRC, '..');
 
 const USAGE = `guitarGenTool — 吉他指板模进练习生成器
 
@@ -49,14 +51,21 @@ function parseArgv(argv) {
 
 const splitList = (value) => (value ? value.split(',').map((s) => s.trim()).filter(Boolean) : undefined);
 
-function runGenerate(flags) {
-  const { exercises, skipped } = buildPlan({
+function selection(flags) {
+  return {
     keys: splitList(flags.keys),
     modes: splitList(flags.modes),
     types: splitList(flags.types),
-  });
+  };
+}
 
+function announceSkips(skipped) {
   for (const s of skipped) console.log(`SKIP ${s.key} ${s.mode}: ${s.reason}`);
+}
+
+async function runGenerate(flags) {
+  const { exercises, skipped } = buildPlan(selection(flags));
+  announceSkips(skipped);
 
   if (exercises.length === 0) {
     console.error('没有任何练习可以生成（全部组合被拒绝）');
@@ -68,26 +77,59 @@ function runGenerate(flags) {
     console.log(`planned=${exercises.length} skipped=${skipped.length} out=${outRoot}`);
     return 0;
   }
-  console.log(`planned=${exercises.length} skipped=${skipped.length} out=${outRoot}`);
+
+  const { written } = await writePlan(exercises, outRoot);
+  const manifest = await buildManifest(exercises, outRoot);
+  await writeManifest(manifest, {
+    jsonPath: path.join(outRoot, 'manifest.json'),
+    mdPath: path.join(outRoot, 'MANIFEST.md'),
+  });
+  console.log(`written=${written} skipped=${skipped.length} out=${outRoot}`);
   return 0;
 }
 
-function runValidate(flags) {
-  console.error('validate 尚未接入（Task 10 实现）');
-  return 3;
+async function runValidate(flags) {
+  const { validatePlan } = await import('./validate.mjs');
+  const { exercises } = buildPlan(selection(flags));
+  const root = path.resolve(HERE, flags.root ?? 'dist');
+
+  let selected = exercises;
+  if (flags.sample) {
+    const limit = Number(flags.sample);
+    const seen = new Map();
+    selected = exercises.filter((e) => {
+      const n = seen.get(e.dir) ?? 0;
+      if (n >= limit) return false;
+      seen.set(e.dir, n + 1);
+      return true;
+    });
+  }
+
+  const { groups, totals } = await validatePlan(selected, root);
+  for (const g of groups) {
+    console.log(`${g.dir}: ${g.found}/${g.expected} files, errors=${g.errors.length}`);
+    for (const e of g.errors.slice(0, 3)) console.log('  ' + e);
+  }
+  console.log(`TOTAL files=${totals.files} errors=${totals.errors}`);
+  return totals.errors ? 1 : 0;
 }
 
-function runManifest(flags) {
-  console.error('manifest 尚未接入（Task 10 实现）');
-  return 3;
+async function runManifest(flags) {
+  const { exercises } = buildPlan(selection(flags));
+  const root = path.resolve(HERE, flags.root ?? 'dist');
+  const jsonPath = path.resolve(HERE, flags.out ?? path.join(root, 'manifest.json'));
+  const manifest = await buildManifest(exercises, root);
+  await writeManifest(manifest, { jsonPath, mdPath: jsonPath.replace(/\.json$/, '.md') });
+  console.log(`wrote ${jsonPath} (${manifest.totals.exercises} exercises)`);
+  return 0;
 }
 
-function runImport(flags) {
-  console.error('import 插件尚未接入（Task 11 实现）');
-  return 3;
+async function runImport(flags) {
+  const { runImportCommand } = await import('./plugins.mjs');
+  return runImportCommand(flags, { root: path.resolve(HERE, flags.root ?? 'dist') });
 }
 
-function main(argv) {
+async function main(argv) {
   const { flags, positional } = parseArgv(argv);
   if (flags.help || positional.length === 0) {
     console.log(USAGE);
@@ -105,13 +147,13 @@ function main(argv) {
 }
 
 try {
-  process.exitCode = main(process.argv.slice(2));
+  process.exitCode = await main(process.argv.slice(2));
 } catch (err) {
   if (err instanceof UsageError) {
     console.error(err.message);
     process.exitCode = 2;
   } else {
     console.error(err.message ?? String(err));
-    process.exitCode = 2;
+    process.exitCode = err.code === 'DEP_MISSING' ? 3 : 2;
   }
 }
