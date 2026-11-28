@@ -1,0 +1,14 @@
+\title "G Ionian · i2 · P6_P7 · T2"
+\subtitle "二度模进 · 相邻把位上下行"
+\tempo 70
+\track "Guitar" { instrument acousticguitarsteel }
+\staff { score tabs }
+\tuning (E4 B3 G3 D3 A2 E2)
+\ts 4 4
+\ks G
+\section "G-Ionian-i2-P6_P7-T2"
+:8 12.6 14.6 15.6 12.5 14.5 15.5 12.4 14.4 |
+16.4 12.3 14.3 16.3 13.2 15.2 17.2 14.1 |
+15.1 17.1 19.1 17.1 15.1 19.2 17.2 15.2 |
+17.3 16.3 14.3 17.4 16.4 14.4 17.5 15.5 |
+14.5 17.6 15.6 14.6 14.6 12.6 r r |

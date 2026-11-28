@@ -1,0 +1,14 @@
+\title "C Locrian · i2 · P6_P7 · T2"
+\subtitle "二度模进 · 相邻把位上下行"
+\tempo 70
+\track "Guitar" { instrument acousticguitarsteel }
+\staff { score tabs }
+\tuning (E4 B3 G3 D3 A2 E2)
+\ts 4 4
+\ks Db
+\section "C-Locrian-i2-P6_P7-T2"
+:8 4.6 6.6 8.6 4.5 6.5 8.5 4.4 6.4 |
+8.4 5.3 6.3 8.3 6.2 7.2 9.2 6.1 |
+8.1 9.1 11.1 9.1 8.1 11.2 9.2 7.2 |
+10.3 8.3 6.3 10.4 8.4 6.4 9.5 8.5 |
+6.5 9.6 8.6 6.6 6.6 4.6 r r |

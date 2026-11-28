@@ -1,0 +1,15 @@
+\title "C Phrygian · i8 · P7 · T1"
+\subtitle "八度模进 · 同把位上下行"
+\tempo 70
+\track "Guitar" { instrument acousticguitarsteel }
+\staff { score tabs }
+\tuning (E4 B3 G3 D3 A2 E2)
+\ts 4 4
+\ks Ab
+\section "C-Phrygian-i8-P7-T1"
+:8 6.6 8.4 8.6 10.4 9.6 6.3 6.5 8.3 |
+8.5 10.3 10.5 8.2 6.4 9.2 8.4 11.2 |
+10.4 8.1 6.3 9.1 8.3 11.1 11.1 8.3 |
+9.1 6.3 8.1 10.4 11.2 8.4 9.2 6.4 |
+8.2 10.5 10.3 8.5 8.3 6.5 6.3 9.6 |
+10.4 8.6 8.4 6.6 r r r r |
